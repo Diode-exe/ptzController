@@ -9,6 +9,8 @@ class GUI:
         self.root = tk.Tk()
         self.root.title("PTZ Controller")
 
+        self.root.geometry("800x200")
+
         self.controller_inputs_var = tk.StringVar()
         self.controller_inputs_var.set("Controller Inputs will be displayed here.")
 
