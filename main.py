@@ -2,6 +2,7 @@
 
 import tkinter as tk
 import pygame
+import sys
 
 class GUI:
     """Graphical User Interface for displaying controller inputs."""
@@ -61,7 +62,7 @@ class PTZControl:
         # Check if a controller is actually plugged in
         if pygame.joystick.get_count() == 0:
             print("No controller found! Plug it in and try again.")
-            exit()
+            sys.exit()
 
         # Connect to the first controller
         self.controller = pygame.joystick.Joystick(0)
