@@ -1,6 +1,7 @@
 """PTZ Controller"""
 
 import tkinter as tk
+import threading
 from ptz_control import PTZControl
 
 class GUI:
@@ -21,14 +22,16 @@ class GUI:
         """Start the GUI event loop."""
         self.root.mainloop()
 
-    # def threaded_read_inputs(self):
-    #     input_thread = threading.Thread(target=self.read_inputs, daemon=True)
-    #     input_thread.start()
+    def threaded_read_inputs(self):
+        """Start the controller input reading in a separate thread."""
+        input_thread = threading.Thread(target=self.read_inputs, daemon=True)
+        input_thread.start()
 
 if __name__ == "__main__":
     gui = GUI()
 
     ptz_control = PTZControl(gui)
-    ptz_control.read_inputs()
+    # ptz_control.read_inputs()
+    gui.threaded_read_inputs()
 
     gui.run()
