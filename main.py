@@ -1,8 +1,10 @@
 """PTZ Controller"""
 
 import tkinter as tk
-import pygame
 import sys
+import pygame
+import serial
+from senders import SenderFunctions
 
 class GUI:
     """Graphical User Interface for displaying controller inputs."""
@@ -54,6 +56,8 @@ class PTZControl:
         self.dpad_direction = "Neutral"
 
         self.gui = gui_arg
+        
+        self.sender_functions = SenderFunctions()
 
         # Initialize Pygame and the Joystick system
         pygame.init()
@@ -132,6 +136,22 @@ class PTZControl:
                 f"| DPad: {self.dpad_direction}"
             )
             self.gui.controller_inputs_var.set(controller_inputs_text)
+            with serial.Serial(self.sender_functions.TX_PORT,
+                               self.sender_functions.BAUD_RATE, timeout=1) as ser:
+                if self.ls_y < -0.5:
+                    self.sender_functions.move_up(ser)
+                elif self.ls_y > 0.5:
+                    self.sender_functions.move_down(ser)
+                elif self.ls_x < -0.5:
+                    self.sender_functions.move_left(ser)
+                elif self.ls_x > 0.5:
+                    self.sender_functions.move_right(ser)
+                else:
+                    self.sender_functions.stop(ser)
+                if self.lt > 0.5:
+                    self.sender_functions.zoom_in(ser)
+                elif self.rt > 0.5:
+                    self.sender_functions.zoom_out(ser)
 
             # Schedule the next poll on the Tk mainloop (milliseconds)
             self.gui.root.after(50, self.read_inputs)  # ~20 Hz
