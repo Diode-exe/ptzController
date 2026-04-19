@@ -56,7 +56,7 @@ class PTZControl:
         self.dpad_direction = "Neutral"
 
         self.gui = gui_arg
-        
+
         self.sender_functions = SenderFunctions()
 
         # Initialize Pygame and the Joystick system
@@ -133,11 +133,11 @@ class PTZControl:
                 f"| X: {self.btn_x} | Y: {self.btn_y} "
                 f"| LB: {self.l_bumper} | RB: {self.r_bumper} "
                 f"| LS Click: {self.ls_click} | RS Click: {self.rs_click} "
-                f"| DPad: {self.dpad_direction}"
+                f"| DPad: {self.dpad_direction} | Address: {self.sender_functions.address} "
             )
             self.gui.controller_inputs_var.set(controller_inputs_text)
-            with serial.Serial(self.sender_functions.TX_PORT,
-                               self.sender_functions.BAUD_RATE, timeout=1) as ser:
+            with serial.Serial(self.sender_functions.tx_port,
+                               self.sender_functions.baud_rate, timeout=1) as ser:
                 if self.ls_y < -0.5:
                     self.sender_functions.move_up(ser)
                 elif self.ls_y > 0.5:
@@ -152,6 +152,10 @@ class PTZControl:
                     self.sender_functions.zoom_in(ser)
                 elif self.rt > 0.5:
                     self.sender_functions.zoom_out(ser)
+                if self.dpad_direction == "Up":
+                    self.sender_functions.address += 1
+                elif self.dpad_direction == "Down" and self.sender_functions.address > 1:
+                    self.sender_functions.address -= 1
 
             # Schedule the next poll on the Tk mainloop (milliseconds)
             self.gui.root.after(50, self.read_inputs)  # ~20 Hz

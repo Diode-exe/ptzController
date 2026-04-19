@@ -1,7 +1,11 @@
+"""Sender Functions for Pelco-D Protocol"""
+
 class SenderFunctions:
+    """Encapsulates all the functions to send Pelco-D commands based on controller input."""
     def __init__(self):
-        self.TX_PORT = 'COM6'
-        self.BAUD_RATE = 9600
+        self.tx_port = 'COM6'
+        self.baud_rate = 9600
+        self.address = 1
 
 
     def ptz_command(self, ser, address, cmd2, pan_speed=0, tilt_speed=0):
@@ -27,44 +31,62 @@ class SenderFunctions:
 
 # --- Directional Functions ---
 
-    def stop(self, ser, addr=1):
+    def stop(self, ser, addr=None):
         """Sends a stop command (no movement)"""
+        if addr is None:
+            addr = self.address
         return self.ptz_command(ser, addr, 0x00, 0, 0)
 
-    def move_up(self, ser, addr=1, speed=0x20):
+    def move_up(self, ser, addr=None, speed=0x20):
         """Sends a command to move the camera up"""
+        if addr is None:
+            addr = self.address
         return self.ptz_command(ser, addr, 0x08, 0, speed)
 
-    def move_down(self, ser, addr=1, speed=0x20):
+    def move_down(self, ser, addr=None, speed=0x20):
         """Sends a command to move the camera down"""
+        if addr is None:
+            addr = self.address
         return self.ptz_command(ser, addr, 0x10, 0, speed)
 
-    def move_left(self, ser, addr=1, speed=0x20):
+    def move_left(self, ser, addr=None, speed=0x20):
         """Sends a command to move the camera left"""
+        if addr is None:
+            addr = self.address
         return self.ptz_command(ser, addr, 0x04, speed, 0)
 
-    def move_right(self, ser, addr=1, speed=0x20):
+    def move_right(self, ser, addr=None, speed=0x20):
         """Sends a command to move the camera right"""
+        if addr is None:
+            addr = self.address
         return self.ptz_command(ser, addr, 0x02, speed, 0)
 
     # --- Diagonal Combinations ---
 
-    def move_up_right(self, ser, addr=1, p_speed=0x20, t_speed=0x20):
+    def move_up_right(self, ser, addr=None, p_speed=0x20, t_speed=0x20):
         """Sends a command to move the camera up and right"""
+        if addr is None:
+            addr = self.address
         # 0x08 (Up) | 0x02 (Right) = 0x0A
         return self.ptz_command(ser, addr, 0x0A, p_speed, t_speed)
 
-    def move_down_left(self, ser, addr=1, p_speed=0x20, t_speed=0x20):
+    def move_down_left(self, ser, addr=None, p_speed=0x20, t_speed=0x20):
         """Sends a command to move the camera down and left"""
+        if addr is None:
+            addr = self.address
         # 0x10 (Down) | 0x04 (Left) = 0x14
         return self.ptz_command(ser, addr, 0x14, p_speed, t_speed)
 
     # --- Zoom Functions ---
 
-    def zoom_in(self, ser, addr=1):
+    def zoom_in(self, ser, addr=None):
         """Sends a command to zoom in"""
+        if addr is None:
+            addr = self.address
         return self.ptz_command(ser, addr, 0x20, 0, 0)
 
-    def zoom_out(self, ser, addr=1):
+    def zoom_out(self, ser, addr=None):
         """Sends a command to zoom out"""
+        if addr is None:
+            addr = self.address
         return self.ptz_command(ser, addr, 0x40, 0, 0)

@@ -1,11 +1,13 @@
-import serial
+"""Send Test Script for Pelco-D Protocol"""
+
 import time
+import serial
 
 # Change 'COM6' to the port of your first adapter
-TX_PORT = 'COM6'
-BAUD_RATE = 9600
+tx_port = 'COM6'
+baud_rate = 9600
 
-def send_pelco_d(ser, address, cmd2, pan_speed, tilt_speed):
+def send_pelco_d(ser_ref, address, cmd2, pan_speed, tilt_speed):
     """
     Standard 7-byte Pelco-D Packet:
     [Sync, Address, Command1, Command2, Data1, Data2, Checksum]
@@ -17,12 +19,12 @@ def send_pelco_d(ser, address, cmd2, pan_speed, tilt_speed):
     checksum = (address + cmd1 + cmd2 + pan_speed + tilt_speed) % 256
 
     packet = bytearray([sync, address, cmd1, cmd2, pan_speed, tilt_speed, checksum])
-    ser.write(packet)
+    ser_ref.write(packet)
     return packet.hex().upper()
 
 try:
-    with serial.Serial(TX_PORT, BAUD_RATE, timeout=1) as ser:
-        print(f"Controller started on {TX_PORT}. Sending 'Pan Left'...")
+    with serial.Serial(tx_port, baud_rate, timeout=1) as ser:
+        print(f"Controller started on {tx_port}. Sending 'Pan Left'...")
 
         # Address 1, Command 0x04 (Left), Pan Speed 0x20, Tilt 0x00
         for _ in range(2):  # Send the command multiple times for testing
@@ -41,4 +43,4 @@ try:
         print(f"Sent: {hex_sent} (Stop)")
 
 except serial.SerialException as e:
-    print(f"Error: Could not open {TX_PORT}. Is it plugged in?")
+    print(f"Error: Could not open {tx_port}. Is it plugged in?")

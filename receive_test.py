@@ -1,11 +1,13 @@
+"""Receive Test Script for Pelco-D Protocol"""
+
 import serial
 
 # Change 'COM5' to the port of your second adapter
 RX_PORT = 'COM7'
-BAUD_RATE = 9600
+baud_rate = 9600
 
 try:
-    with serial.Serial(RX_PORT, BAUD_RATE, timeout=0.1) as ser:
+    with serial.Serial(RX_PORT, baud_rate, timeout=0.1) as ser:
         print(f"Monitoring {RX_PORT} for Pelco-D packets... (Ctrl+C to stop)")
 
         while True:
