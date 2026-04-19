@@ -1,6 +1,8 @@
 class SenderFunctions:
     def __init__(self):
-        pass
+        self.TX_PORT = 'COM6'
+        self.BAUD_RATE = 9600
+
 
     def ptz_command(self, ser, address, cmd2, pan_speed=0, tilt_speed=0):
         """
