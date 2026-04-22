@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Church PTZ Control</title>
+    <style>
+        .control-btn { width: 100px; height: 100px; font-size: 20px; margin: 10px; }
+        .container { text-align: center; margin-top: 50px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PTZ Controller</h1>
+        <button class="ptz-btn" data-dir="up">UP</button><br>
+        <button class="ptz-btn" data-dir="left">LEFT</button>
+        <button class="ptz-btn" data-dir="stop" style="color:red">STOP</button>
+        <button class="ptz-btn" data-dir="right">RIGHT</button><br>
+        <button class="ptz-btn" data-dir="down">DOWN</button>
+    </div>
+
+    <script>
+        // Select all buttons with the class 'ptz-btn'
+        const buttons = document.querySelectorAll('.ptz-btn');
+
+        // Build base URL forcing port 5000 (falls back to localhost for file: protocol)
+        const host = location.hostname || 'localhost';
+        const proto = (location.protocol === 'file:') ? 'http:' : location.protocol;
+        const base = `${proto}//${host}:5000`;
+
+        buttons.forEach(btn => {
+            const direction = btn.getAttribute('data-dir');
+
+            // MouseDown: Start moving
+            btn.addEventListener('mousedown', () => {
+                fetch(`${base}/cmd/${direction}`);
+            });
+
+            // MouseUp: Stop moving
+            btn.addEventListener('mouseup', () => {
+                fetch(`${base}/cmd/stop`);
+            });
+
+            // Touch events for phone/tablet support
+            btn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                fetch(`${base}/cmd/${direction}`);
+            });
+            btn.addEventListener('touchend', () => {
+                fetch(`${base}/cmd/stop`);
+            });
+        });
+    </script>
+</body>
+</html>

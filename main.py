@@ -24,7 +24,7 @@ class GUI:
 
     def threaded_read_inputs(self):
         """Start the controller input reading in a separate thread."""
-        input_thread = threading.Thread(target=self.read_inputs, daemon=True)
+        input_thread = threading.Thread(target=ptz_control.read_inputs, daemon=True)
         input_thread.start()
 
 if __name__ == "__main__":
