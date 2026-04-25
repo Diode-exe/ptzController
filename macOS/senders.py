@@ -7,7 +7,6 @@ class SenderFunctions:
         self.baud_rate = 9600
         self.address = 1
 
-
     def ptz_command(self, ser, address, cmd2, pan_speed=0, tilt_speed=0):
         """
         Base function to send Pelco-D packets.
