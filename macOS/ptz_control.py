@@ -2,7 +2,6 @@
 
 import os
 import sys
-import traceback
 import pygame
 import serial
 from senders import SenderFunctions
@@ -48,38 +47,26 @@ class PTZControl:
         # Some environments don't have a usable video driver; try a safe fallback.
         try:
             pygame.init()
-        except pygame.error as e:
+        except pygame.error:
             # Fall back to the "dummy" SDL video driver and re-init pygame.
-            print("pygame.init() failed:", e)
             os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
             try:
                 pygame.quit()
             except Exception:
                 pass
-            try:
-                pygame.init()
-            except Exception as e2:
-                print("pygame.init() still failed after dummy driver:", e2)
-                traceback.print_exc()
+            pygame.init()
 
         # Ensure joystick subsystem is initialized
         try:
             pygame.joystick.init()
-        except Exception as e:
-            print("pygame.joystick.init() failed:", e)
-            traceback.print_exc()
+        except Exception:
+            # If joystick init fails, continue — read_inputs will handle errors.
+            pass
 
         # Check if a controller is actually plugged in
-        try:
-            jc = pygame.joystick.get_count()
-        except Exception as e:
-            print("pygame.joystick.get_count() failed:", e)
-            traceback.print_exc()
-            jc = 0
-        print(f"SDL_VIDEODRIVER={os.environ.get('SDL_VIDEODRIVER')} pygame_inited={pygame.get_init()} joysticks={jc}")
-        if jc == 0:
+        if pygame.joystick.get_count() == 0:
             print("No controller found! Plug it in and try again.")
-            raise RuntimeError("No controller found")
+            sys.exit()
 
         # Connect to the first controller
         self.controller = pygame.joystick.Joystick(0)
@@ -205,7 +192,6 @@ class PTZControl:
 
         except Exception as e:
             print("Error reading inputs:", e)
-            traceback.print_exc()
             try:
                 pygame.quit()
             except Exception:
