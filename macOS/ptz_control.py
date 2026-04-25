@@ -76,108 +76,108 @@ class PTZControl:
         re-schedules itself using `tk.after` so it doesn't block the GUI
         mainloop.
         """
-        try:
-            # Pygame needs to "pump" events to update the values
-            pygame.event.pump()
-
-            # 1. Read the Analog Sticks (Values are -1.0 to 1.0)
-            self.ls_x = self.controller.get_axis(0)
-            self.ls_y = self.controller.get_axis(1)
-            self.rs_x = self.controller.get_axis(3)
-            self.rs_y = self.controller.get_axis(2)
-            # print("Got axes...")
-
-            # 2. Read the Triggers (Values are -1.0 to 1.0)
-            self.lt = self.controller.get_axis(4)
-            self.rt = self.controller.get_axis(5)
-            # print("Got triggers...")
-
-            # 3. Read Buttons (0 = not pressed, 1 = pressed)
-            self.btn_a = self.controller.get_button(0)
-            self.btn_b = self.controller.get_button(1)
-            self.btn_x = self.controller.get_button(2)
-            self.btn_y = self.controller.get_button(3)
-            # print("Got buttons...")
-
-            self.l_bumper = self.controller.get_button(4)
-            self.r_bumper = self.controller.get_button(5)
-            # print("Got bumpers...")
-
-            self.ls_click = self.controller.get_button(8)  # Left Stick Click
-            self.rs_click = self.controller.get_button(9)  # Right Stick Click
-            # print("Got stick clicks...")
-
-            self.axes = self.controller.get_numaxes()
-            self.buttons = self.controller.get_numbuttons()
-            # print("Got counts...")
-
-            # HAT (D-pad)
+        with serial.Serial(self.sender_functions.tx_port,
+                            self.sender_functions.baud_rate, timeout=1) as ser:
             try:
-                self.dpad_x, self.dpad_y = self.controller.get_hat(0)
-                self.hat_exist = True
-            except Exception:
-                self.dpad_x, self.dpad_y = 0, 0
-                self.hat_exist = False
-            if self.hat_exist:
-                if self.dpad_x == -1:
-                    self.dpad_direction = "Left"
-                elif self.dpad_x == 1:
-                    self.dpad_direction = "Right"
-                elif self.dpad_y == -1:
-                    self.dpad_direction = "Down"
-                elif self.dpad_y == 1:
-                    self.dpad_direction = "Up"
-                else:
-                    self.dpad_direction = "Neutral"
-            # if self.gui:
-            controller_inputs_text = (
-                f"Axes: {self.axes} | Buttons: {self.buttons} "
-                f"| LS: ({self.ls_x:>5.2f}, {self.ls_y:>5.2f})"
-                f"| RS: ({self.rs_x:>5.2f}, {self.rs_y:>5.2f})"
-                f"| LT: {self.lt:>5.2f} | RT: {self.rt:>5.2f} "
-                f"| A: {self.btn_a} | B: {self.btn_b}"
-                f"| X: {self.btn_x} | Y: {self.btn_y} "
-                f"| LB: {self.l_bumper} | RB: {self.r_bumper} "
-                f"| LS Click: {self.ls_click} | RS Click: {self.rs_click} "
-                f"| DPad: {self.dpad_direction} | Address: {self.sender_functions.address} "
-            )
-            print(controller_inputs_text, end="\r", flush=True)  # Print on the same line
-            if self.gui:
-                self.gui.controller_inputs_var.set(controller_inputs_text)
-            with serial.Serial(self.sender_functions.tx_port,
-                               self.sender_functions.baud_rate, timeout=1) as ser:
-                if self.ls_y < -0.5:
-                    self.sender_functions.move_up(ser, speed=self.map_speed(self.ls_y))
-                elif self.ls_y > 0.5:
-                    self.sender_functions.move_down(ser, speed=self.map_speed(self.ls_y))
-                elif self.ls_x < -0.5:
-                    self.sender_functions.move_left(ser, speed=self.map_speed(self.ls_x))
-                elif self.ls_x > 0.5:
-                    self.sender_functions.move_right(ser, speed=self.map_speed(self.ls_x))
-                else:
-                    self.sender_functions.stop(ser)
-                if self.lt > 0.5:
-                    self.sender_functions.zoom_in(ser)
-                elif self.rt > 0.5:
-                    self.sender_functions.zoom_out(ser)
-                if self.dpad_direction == "Up":
-                    self.sender_functions.address += 1
-                elif self.dpad_direction == "Down" and self.sender_functions.address > 1:
-                    self.sender_functions.address -= 1
+                # Pygame needs to "pump" events to update the values
+                pygame.event.pump()
 
-            # Schedule the next poll on the Tk mainloop (milliseconds)
-            if self.gui:
-                self.gui.root.after(50, self.read_inputs)  # ~20 Hz
+                # 1. Read the Analog Sticks (Values are -1.0 to 1.0)
+                self.ls_x = self.controller.get_axis(0)
+                self.ls_y = self.controller.get_axis(1)
+                self.rs_x = self.controller.get_axis(3)
+                self.rs_y = self.controller.get_axis(2)
+                # print("Got axes...")
 
-        except Exception as e:
-            print("Error reading inputs:", e)
-            try:
-                pygame.quit()
-            except Exception:
-                pass
-            # If GUI exists, close it to stop the app
-            if self.gui:
+                # 2. Read the Triggers (Values are -1.0 to 1.0)
+                self.lt = self.controller.get_axis(4)
+                self.rt = self.controller.get_axis(5)
+                # print("Got triggers...")
+
+                # 3. Read Buttons (0 = not pressed, 1 = pressed)
+                self.btn_a = self.controller.get_button(0)
+                self.btn_b = self.controller.get_button(1)
+                self.btn_x = self.controller.get_button(2)
+                self.btn_y = self.controller.get_button(3)
+                # print("Got buttons...")
+
+                self.l_bumper = self.controller.get_button(4)
+                self.r_bumper = self.controller.get_button(5)
+                # print("Got bumpers...")
+
+                self.ls_click = self.controller.get_button(8)  # Left Stick Click
+                self.rs_click = self.controller.get_button(9)  # Right Stick Click
+                # print("Got stick clicks...")
+
+                self.axes = self.controller.get_numaxes()
+                self.buttons = self.controller.get_numbuttons()
+                # print("Got counts...")
+
+                # HAT (D-pad)
                 try:
-                    self.gui.root.quit()
+                    self.dpad_x, self.dpad_y = self.controller.get_hat(0)
+                    self.hat_exist = True
+                except Exception:
+                    self.dpad_x, self.dpad_y = 0, 0
+                    self.hat_exist = False
+                if self.hat_exist:
+                    if self.dpad_x == -1:
+                        self.dpad_direction = "Left"
+                    elif self.dpad_x == 1:
+                        self.dpad_direction = "Right"
+                    elif self.dpad_y == -1:
+                        self.dpad_direction = "Down"
+                    elif self.dpad_y == 1:
+                        self.dpad_direction = "Up"
+                    else:
+                        self.dpad_direction = "Neutral"
+                # if self.gui:
+                controller_inputs_text = (
+                    f"Axes: {self.axes} | Buttons: {self.buttons} "
+                    f"| LS: ({self.ls_x:>5.2f}, {self.ls_y:>5.2f})"
+                    f"| RS: ({self.rs_x:>5.2f}, {self.rs_y:>5.2f})"
+                    f"| LT: {self.lt:>5.2f} | RT: {self.rt:>5.2f} "
+                    f"| A: {self.btn_a} | B: {self.btn_b}"
+                    f"| X: {self.btn_x} | Y: {self.btn_y} "
+                    f"| LB: {self.l_bumper} | RB: {self.r_bumper} "
+                    f"| LS Click: {self.ls_click} | RS Click: {self.rs_click} "
+                    f"| DPad: {self.dpad_direction} | Address: {self.sender_functions.address} "
+                )
+                print(controller_inputs_text, end="\r", flush=True)  # Print on the same line
+                if self.gui:
+                    self.gui.controller_inputs_var.set(controller_inputs_text)
+                    if self.ls_y < -0.5:
+                        self.sender_functions.move_up(ser, speed=self.map_speed(self.ls_y))
+                    elif self.ls_y > 0.5:
+                        self.sender_functions.move_down(ser, speed=self.map_speed(self.ls_y))
+                    elif self.ls_x < -0.5:
+                        self.sender_functions.move_left(ser, speed=self.map_speed(self.ls_x))
+                    elif self.ls_x > 0.5:
+                        self.sender_functions.move_right(ser, speed=self.map_speed(self.ls_x))
+                    else:
+                        self.sender_functions.stop(ser)
+                    if self.lt > 0.5:
+                        self.sender_functions.zoom_in(ser)
+                    elif self.rt > 0.5:
+                        self.sender_functions.zoom_out(ser)
+                    if self.dpad_direction == "Up":
+                        self.sender_functions.address += 1
+                    elif self.dpad_direction == "Down" and self.sender_functions.address > 1:
+                        self.sender_functions.address -= 1
+
+                # Schedule the next poll on the Tk mainloop (milliseconds)
+                if self.gui:
+                    self.gui.root.after(50, self.read_inputs)  # ~20 Hz
+
+            except Exception as e:
+                print("Error reading inputs:", e)
+                try:
+                    pygame.quit()
                 except Exception:
                     pass
+                # If GUI exists, close it to stop the app
+                if self.gui:
+                    try:
+                        self.gui.root.quit()
+                    except Exception:
+                        pass
