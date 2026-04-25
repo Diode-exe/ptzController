@@ -1,6 +1,5 @@
 """PTZ Control Logic and Controller Input Handling"""
 
-import os
 import sys
 import pygame
 import serial
@@ -43,25 +42,9 @@ class PTZControl:
 
         self.sender_functions = SenderFunctions()
 
-        # Initialize Pygame and the Joystick system.
-        # Some environments don't have a usable video driver; try a safe fallback.
-        try:
-            pygame.init()
-        except pygame.error:
-            # Fall back to the "dummy" SDL video driver and re-init pygame.
-            os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
-            try:
-                pygame.quit()
-            except Exception:
-                pass
-            pygame.init()
-
-        # Ensure joystick subsystem is initialized
-        try:
-            pygame.joystick.init()
-        except Exception:
-            # If joystick init fails, continue — read_inputs will handle errors.
-            pass
+        # Initialize Pygame and the Joystick system
+        pygame.init()
+        pygame.joystick.init()
 
         # Check if a controller is actually plugged in
         if pygame.joystick.get_count() == 0:
@@ -94,13 +77,8 @@ class PTZControl:
         mainloop.
         """
         try:
-            # Pygame needs to "pump" events to update the values. Guard against
-            # environments where the video/event system may not be available.
-            try:
-                pygame.event.pump()
-            except pygame.error:
-                # If event pump isn't available, skip; joystick reads may still work.
-                pass
+            # Pygame needs to "pump" events to update the values
+            pygame.event.pump()
 
             # 1. Read the Analog Sticks (Values are -1.0 to 1.0)
             self.ls_x = self.controller.get_axis(0)
