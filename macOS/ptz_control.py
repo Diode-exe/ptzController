@@ -195,6 +195,7 @@ class PTZControl:
                 print("Decreasing Address", end="\r", flush=True)
                 self.sender_functions.address -= 1
                 print("New Address:", self.sender_functions.address)
+            time.sleep(0.05)  # Small delay to prevent spamming commands too rapidly
 
             # Schedule the next poll on the Tk mainloop (milliseconds)
             if self.gui:
