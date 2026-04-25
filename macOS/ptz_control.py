@@ -33,6 +33,8 @@ class PTZControl:
 
         self.dpad_x = 0
         self.dpad_y = 0
+        
+        self.hat_exist = False
 
         self.dpad_direction = "Neutral"
 
@@ -112,19 +114,21 @@ class PTZControl:
             # HAT (D-pad)
             try:
                 self.dpad_x, self.dpad_y = self.controller.get_hat(0)
+                self.hat_exist = True
             except Exception:
                 self.dpad_x, self.dpad_y = 0, 0
-
-            if self.dpad_x == -1:
-                self.dpad_direction = "Left"
-            elif self.dpad_x == 1:
-                self.dpad_direction = "Right"
-            elif self.dpad_y == -1:
-                self.dpad_direction = "Down"
-            elif self.dpad_y == 1:
-                self.dpad_direction = "Up"
-            else:
-                self.dpad_direction = "Neutral"
+                self.hat_exist = False
+            if self.hat_exist:
+                if self.dpad_x == -1:
+                    self.dpad_direction = "Left"
+                elif self.dpad_x == 1:
+                    self.dpad_direction = "Right"
+                elif self.dpad_y == -1:
+                    self.dpad_direction = "Down"
+                elif self.dpad_y == 1:
+                    self.dpad_direction = "Up"
+                else:
+                    self.dpad_direction = "Neutral"
 
             controller_inputs_text = (
                 f"Axes: {self.axes} | Buttons: {self.buttons} "
