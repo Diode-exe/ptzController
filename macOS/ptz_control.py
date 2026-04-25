@@ -153,30 +153,39 @@ class PTZControl:
                 if self.ls_y < -0.5:
                     print("Moving Up   ", end="\r", flush=True)
                     self.sender_functions.move_up(ser, speed=self.map_speed(self.ls_y))
+                    print("Successfully sent move_up command")
                 elif self.ls_y > 0.5:
                     print("Moving Down ", end="\r", flush=True)
                     self.sender_functions.move_down(ser, speed=self.map_speed(self.ls_y))
+                    print("Successfully sent move_down command")
                 elif self.ls_x < -0.5:
                     print("Moving Left ", end="\r", flush=True)
                     self.sender_functions.move_left(ser, speed=self.map_speed(self.ls_x))
+                    print("Successfully sent move_left command")
                 elif self.ls_x > 0.5:
                     print("Moving Right", end="\r", flush=True)
                     self.sender_functions.move_right(ser, speed=self.map_speed(self.ls_x))
+                    print("Successfully sent move_right command")
                 else:
                     print("Stopping    ", end="\r", flush=True)
                     self.sender_functions.stop(ser)
+                    print("Successfully sent stop command")
                 if self.lt > 0.5:
                     print("Zooming In  ", end="\r", flush=True)
                     self.sender_functions.zoom_in(ser)
+                    print("Successfully sent zoom_in command")
                 elif self.rt > 0.5:
                     print("Zooming Out ", end="\r", flush=True)
                     self.sender_functions.zoom_out(ser)
+                    print("Successfully sent zoom_out command")
                 if self.dpad_direction == "Up":
                     print("Increasing Address", end="\r", flush=True)
                     self.sender_functions.address += 1
+                    print("New Address:", self.sender_functions.address)
                 elif self.dpad_direction == "Down" and self.sender_functions.address > 1:
                     print("Decreasing Address", end="\r", flush=True)
                     self.sender_functions.address -= 1
+                    print("New Address:", self.sender_functions.address)
 
                 # Schedule the next poll on the Tk mainloop (milliseconds)
                 if self.gui:
