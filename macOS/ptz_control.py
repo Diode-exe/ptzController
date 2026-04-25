@@ -147,24 +147,24 @@ class PTZControl:
                 print(f"{controller_inputs_text}{controller_inputs_text_2}", end="\r", flush=True)  # Print on the same line
                 if self.gui:
                     self.gui.controller_inputs_var.set(controller_inputs_text)
-                    if self.ls_y < -0.5:
-                        self.sender_functions.move_up(ser, speed=self.map_speed(self.ls_y))
-                    elif self.ls_y > 0.5:
-                        self.sender_functions.move_down(ser, speed=self.map_speed(self.ls_y))
-                    elif self.ls_x < -0.5:
-                        self.sender_functions.move_left(ser, speed=self.map_speed(self.ls_x))
-                    elif self.ls_x > 0.5:
-                        self.sender_functions.move_right(ser, speed=self.map_speed(self.ls_x))
-                    else:
-                        self.sender_functions.stop(ser)
-                    if self.lt > 0.5:
-                        self.sender_functions.zoom_in(ser)
-                    elif self.rt > 0.5:
-                        self.sender_functions.zoom_out(ser)
-                    if self.dpad_direction == "Up":
-                        self.sender_functions.address += 1
-                    elif self.dpad_direction == "Down" and self.sender_functions.address > 1:
-                        self.sender_functions.address -= 1
+                if self.ls_y < -0.5:
+                    self.sender_functions.move_up(ser, speed=self.map_speed(self.ls_y))
+                elif self.ls_y > 0.5:
+                    self.sender_functions.move_down(ser, speed=self.map_speed(self.ls_y))
+                elif self.ls_x < -0.5:
+                    self.sender_functions.move_left(ser, speed=self.map_speed(self.ls_x))
+                elif self.ls_x > 0.5:
+                    self.sender_functions.move_right(ser, speed=self.map_speed(self.ls_x))
+                else:
+                    self.sender_functions.stop(ser)
+                if self.lt > 0.5:
+                    self.sender_functions.zoom_in(ser)
+                elif self.rt > 0.5:
+                    self.sender_functions.zoom_out(ser)
+                if self.dpad_direction == "Up":
+                    self.sender_functions.address += 1
+                elif self.dpad_direction == "Down" and self.sender_functions.address > 1:
+                    self.sender_functions.address -= 1
 
                 # Schedule the next poll on the Tk mainloop (milliseconds)
                 if self.gui:
