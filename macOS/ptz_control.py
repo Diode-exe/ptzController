@@ -213,3 +213,18 @@ class PTZControl:
                     self.gui.root.quit()
                 except Exception:
                     pass
+            self.ser.close()
+        
+        except KeyboardInterrupt:
+            print("\nExiting gracefully...")
+            try:
+                pygame.quit()
+            except Exception:
+                pass
+            # If GUI exists, close it to stop the app
+            if self.gui:
+                try:
+                    self.gui.root.quit()
+                except Exception:
+                    pass
+            self.ser.close()
