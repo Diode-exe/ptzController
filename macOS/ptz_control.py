@@ -33,7 +33,7 @@ class PTZControl:
 
         self.dpad_x = 0
         self.dpad_y = 0
-        
+
         self.hat_exist = False
 
         self.dpad_direction = "Neutral"
