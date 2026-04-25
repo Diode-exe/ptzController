@@ -83,28 +83,37 @@ class PTZControl:
             self.ls_y = self.controller.get_axis(1)
             self.rs_x = self.controller.get_axis(3)
             self.rs_y = self.controller.get_axis(2)
+            print("Got axes...")
 
             # 2. Read the Triggers (Values are -1.0 to 1.0)
             self.lt = self.controller.get_axis(4)
             self.rt = self.controller.get_axis(5)
+            print("Got triggers...")
 
             # 3. Read Buttons (0 = not pressed, 1 = pressed)
             self.btn_a = self.controller.get_button(0)
             self.btn_b = self.controller.get_button(1)
             self.btn_x = self.controller.get_button(2)
             self.btn_y = self.controller.get_button(3)
+            print("Got buttons...")
 
             self.l_bumper = self.controller.get_button(4)
             self.r_bumper = self.controller.get_button(5)
+            print("Got bumpers...")
 
             self.ls_click = self.controller.get_button(8)  # Left Stick Click
             self.rs_click = self.controller.get_button(9)  # Right Stick Click
+            print("Got stick clicks...")
 
             self.axes = self.controller.get_numaxes()
             self.buttons = self.controller.get_numbuttons()
+            print("Got counts...")
 
             # HAT (D-pad)
-            self.dpad_x, self.dpad_y = self.controller.get_hat(0)
+            try:
+                self.dpad_x, self.dpad_y = self.controller.get_hat(0)
+            except Exception:
+                self.dpad_x, self.dpad_y = 0, 0
 
             if self.dpad_x == -1:
                 self.dpad_direction = "Left"
