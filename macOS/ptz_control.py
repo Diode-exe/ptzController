@@ -118,6 +118,7 @@ class PTZControl:
                     self.dpad_x, self.dpad_y = self.controller.get_hat(0)
                     self.hat_exist = True
                 except Exception:
+                    print("No HAT (D-pad) found on this controller.")
                     self.dpad_x, self.dpad_y = 0, 0
                     self.hat_exist = False
                 if self.hat_exist:
@@ -138,7 +139,7 @@ class PTZControl:
                     f"| RS: ({self.rs_x:>5.2f}, {self.rs_y:>5.2f})"
                     f"| LT: {self.lt:>5.2f} | RT: {self.rt:>5.2f} ")
                 controller_inputs_text_2 = (
-                    f"| A: {self.btn_a} | B: {self.btn_b}"
+                    f"| A: {self.btn_a} | B: {self.btn_b} "
                     f"| X: {self.btn_x} | Y: {self.btn_y} "
                     f"| LB: {self.l_bumper} | RB: {self.r_bumper} "
                     f"| LS Click: {self.ls_click} | RS Click: {self.rs_click} "
