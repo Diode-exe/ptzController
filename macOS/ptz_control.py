@@ -78,6 +78,20 @@ class PTZControl:
         """
         with serial.Serial(self.sender_functions.tx_port,
                             self.sender_functions.baud_rate, timeout=1) as ser:
+            # Ensure RS-485 DE/RE (RTS) handling on platforms/adapters that require it.
+            # On some macOS USB-RS485 adapters the DE signal isn't toggled automatically
+            # unless pyserial's rs485_mode is configured.
+            try:
+                if hasattr(serial, 'rs485'):
+                    # RTS high during transmit, low during receive; small rx delay after tx
+                    ser.rs485_mode = serial.rs485.RS485Settings(rts_level_for_tx=True,
+                                                                rts_level_for_rx=False,
+                                                                delay_before_tx=0,
+                                                                delay_before_rx=0.01)
+                    # Debug print for diagnostics
+                    print("RS-485 mode set on serial port.", end="\r", flush=True)
+            except Exception as e:
+                print("Warning: could not enable rs485_mode:", e)
             try:
                 # Pygame needs to "pump" events to update the values
                 pygame.event.pump()

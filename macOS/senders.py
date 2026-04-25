@@ -26,6 +26,11 @@ class SenderFunctions:
         packet.append(checksum)
 
         ser.write(packet)
+        try:
+            # Ensure data is transmitted promptly
+            ser.flush()
+        except Exception:
+            pass
         return packet.hex().upper()
 
 # --- Directional Functions ---
