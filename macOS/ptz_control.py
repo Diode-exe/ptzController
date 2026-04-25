@@ -145,26 +145,37 @@ class PTZControl:
                     f"| LS Click: {self.ls_click} | RS Click: {self.rs_click} "
                     f"| DPad: {self.dpad_direction} | Address: {self.sender_functions.address} "
                 )
-                print(f"{controller_inputs_text}{controller_inputs_text_2}", end="\r", flush=True)  # Print on the same line
+                print(f"{controller_inputs_text}{controller_inputs_text_2}",
+                      end="\r", flush=True)  # Print on the same line
+
                 if self.gui:
                     self.gui.controller_inputs_var.set(controller_inputs_text)
                 if self.ls_y < -0.5:
+                    print("Moving Up   ", end="\r", flush=True)
                     self.sender_functions.move_up(ser, speed=self.map_speed(self.ls_y))
                 elif self.ls_y > 0.5:
+                    print("Moving Down ", end="\r", flush=True)
                     self.sender_functions.move_down(ser, speed=self.map_speed(self.ls_y))
                 elif self.ls_x < -0.5:
+                    print("Moving Left ", end="\r", flush=True)
                     self.sender_functions.move_left(ser, speed=self.map_speed(self.ls_x))
                 elif self.ls_x > 0.5:
+                    print("Moving Right", end="\r", flush=True)
                     self.sender_functions.move_right(ser, speed=self.map_speed(self.ls_x))
                 else:
+                    print("Stopping    ", end="\r", flush=True)
                     self.sender_functions.stop(ser)
                 if self.lt > 0.5:
+                    print("Zooming In  ", end="\r", flush=True)
                     self.sender_functions.zoom_in(ser)
                 elif self.rt > 0.5:
+                    print("Zooming Out ", end="\r", flush=True)
                     self.sender_functions.zoom_out(ser)
                 if self.dpad_direction == "Up":
+                    print("Increasing Address", end="\r", flush=True)
                     self.sender_functions.address += 1
                 elif self.dpad_direction == "Down" and self.sender_functions.address > 1:
+                    print("Decreasing Address", end="\r", flush=True)
                     self.sender_functions.address -= 1
 
                 # Schedule the next poll on the Tk mainloop (milliseconds)
