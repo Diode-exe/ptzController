@@ -3,7 +3,7 @@
 class SenderFunctions:
     """Encapsulates all the functions to send Pelco-D commands based on controller input."""
     def __init__(self):
-        self.tx_port = 'BG02YH2O'
+        self.tx_port = '/dev/tty.usb-serial-BG02YH2O'
         self.baud_rate = 9600
         self.address = 1
 
