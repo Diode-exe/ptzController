@@ -129,18 +129,19 @@ class PTZControl:
                     self.dpad_direction = "Up"
                 else:
                     self.dpad_direction = "Neutral"
-            if self.gui:
-                controller_inputs_text = (
-                    f"Axes: {self.axes} | Buttons: {self.buttons} "
-                    f"| LS: ({self.ls_x:>5.2f}, {self.ls_y:>5.2f})"
-                    f"| RS: ({self.rs_x:>5.2f}, {self.rs_y:>5.2f})"
-                    f"| LT: {self.lt:>5.2f} | RT: {self.rt:>5.2f} "
-                    f"| A: {self.btn_a} | B: {self.btn_b}"
-                    f"| X: {self.btn_x} | Y: {self.btn_y} "
-                    f"| LB: {self.l_bumper} | RB: {self.r_bumper} "
-                    f"| LS Click: {self.ls_click} | RS Click: {self.rs_click} "
-                    f"| DPad: {self.dpad_direction} | Address: {self.sender_functions.address} "
-                )
+            # if self.gui:
+            controller_inputs_text = (
+                f"Axes: {self.axes} | Buttons: {self.buttons} "
+                f"| LS: ({self.ls_x:>5.2f}, {self.ls_y:>5.2f})"
+                f"| RS: ({self.rs_x:>5.2f}, {self.rs_y:>5.2f})"
+                f"| LT: {self.lt:>5.2f} | RT: {self.rt:>5.2f} "
+                f"| A: {self.btn_a} | B: {self.btn_b}"
+                f"| X: {self.btn_x} | Y: {self.btn_y} "
+                f"| LB: {self.l_bumper} | RB: {self.r_bumper} "
+                f"| LS Click: {self.ls_click} | RS Click: {self.rs_click} "
+                f"| DPad: {self.dpad_direction} | Address: {self.sender_functions.address} "
+            )
+            print(controller_inputs_text, end="\r", flush=True)  # Print on the same line
             if self.gui:
                 self.gui.controller_inputs_var.set(controller_inputs_text)
             with serial.Serial(self.sender_functions.tx_port,
