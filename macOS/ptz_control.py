@@ -85,31 +85,31 @@ class PTZControl:
             self.ls_y = self.controller.get_axis(1)
             self.rs_x = self.controller.get_axis(3)
             self.rs_y = self.controller.get_axis(2)
-            print("Got axes...")
+            # print("Got axes...")
 
             # 2. Read the Triggers (Values are -1.0 to 1.0)
             self.lt = self.controller.get_axis(4)
             self.rt = self.controller.get_axis(5)
-            print("Got triggers...")
+            # print("Got triggers...")
 
             # 3. Read Buttons (0 = not pressed, 1 = pressed)
             self.btn_a = self.controller.get_button(0)
             self.btn_b = self.controller.get_button(1)
             self.btn_x = self.controller.get_button(2)
             self.btn_y = self.controller.get_button(3)
-            print("Got buttons...")
+            # print("Got buttons...")
 
             self.l_bumper = self.controller.get_button(4)
             self.r_bumper = self.controller.get_button(5)
-            print("Got bumpers...")
+            # print("Got bumpers...")
 
             self.ls_click = self.controller.get_button(8)  # Left Stick Click
             self.rs_click = self.controller.get_button(9)  # Right Stick Click
-            print("Got stick clicks...")
+            # print("Got stick clicks...")
 
             self.axes = self.controller.get_numaxes()
             self.buttons = self.controller.get_numbuttons()
-            print("Got counts...")
+            # print("Got counts...")
 
             # HAT (D-pad)
             try:
@@ -129,18 +129,18 @@ class PTZControl:
                     self.dpad_direction = "Up"
                 else:
                     self.dpad_direction = "Neutral"
-
-            controller_inputs_text = (
-                f"Axes: {self.axes} | Buttons: {self.buttons} "
-                f"| LS: ({self.ls_x:>5.2f}, {self.ls_y:>5.2f})"
-                f"| RS: ({self.rs_x:>5.2f}, {self.rs_y:>5.2f})"
-                f"| LT: {self.lt:>5.2f} | RT: {self.rt:>5.2f} "
-                f"| A: {self.btn_a} | B: {self.btn_b}"
-                f"| X: {self.btn_x} | Y: {self.btn_y} "
-                f"| LB: {self.l_bumper} | RB: {self.r_bumper} "
-                f"| LS Click: {self.ls_click} | RS Click: {self.rs_click} "
-                f"| DPad: {self.dpad_direction} | Address: {self.sender_functions.address} "
-            )
+            if self.gui:
+                controller_inputs_text = (
+                    f"Axes: {self.axes} | Buttons: {self.buttons} "
+                    f"| LS: ({self.ls_x:>5.2f}, {self.ls_y:>5.2f})"
+                    f"| RS: ({self.rs_x:>5.2f}, {self.rs_y:>5.2f})"
+                    f"| LT: {self.lt:>5.2f} | RT: {self.rt:>5.2f} "
+                    f"| A: {self.btn_a} | B: {self.btn_b}"
+                    f"| X: {self.btn_x} | Y: {self.btn_y} "
+                    f"| LB: {self.l_bumper} | RB: {self.r_bumper} "
+                    f"| LS Click: {self.ls_click} | RS Click: {self.rs_click} "
+                    f"| DPad: {self.dpad_direction} | Address: {self.sender_functions.address} "
+                )
             if self.gui:
                 self.gui.controller_inputs_var.set(controller_inputs_text)
             with serial.Serial(self.sender_functions.tx_port,

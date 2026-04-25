@@ -36,4 +36,5 @@ if __name__ == "__main__":
     # gui.threaded_read_inputs()
 
     # gui.run()
-    ptz_control.read_inputs()
+    while True:
+        ptz_control.read_inputs()
