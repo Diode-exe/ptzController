@@ -3,8 +3,6 @@
 class SenderFunctions:
     """Encapsulates all the functions to send Pelco-D commands based on controller input."""
     def __init__(self):
-        # needs to be cu instead of tty because the cameras don't
-        # provide a ready signal or anything
         self.tx_port = '/dev/tty.usbserial-BG02YH2O'
         self.baud_rate = 9600
         self.address = 1
