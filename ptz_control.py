@@ -1,5 +1,6 @@
 """PTZ Control Logic and Controller Input Handling"""
 
+import os
 import sys
 import pygame
 from senders import SenderFunctions
@@ -42,8 +43,10 @@ class PTZControl:
         self.gui = gui_arg
 
         self.ser = None
-
-        self.sender_functions = SenderFunctions()
+        if os.name == 'nt':  # Windows
+            self.sender_functions = SenderFunctions()
+        else:  # Non-Windows (macOS/Linux)
+            self.sender_functions = SenderFunctions(tx_port='/dev/tty.usbserial-BG02YH2O')
 
         # Initialize Pygame and the Joystick system
         pygame.init()

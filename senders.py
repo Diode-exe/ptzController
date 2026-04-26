@@ -2,10 +2,10 @@
 
 class SenderFunctions:
     """Encapsulates all the functions to send Pelco-D commands based on controller input."""
-    def __init__(self):
-        self.tx_port = 'COM6'
-        self.baud_rate = 9600
-        self.address = 1
+    def __init__(self, tx_port="COM1", baud_rate=9600, address=1):
+        self.tx_port = tx_port
+        self.baud_rate = baud_rate
+        self.address = address
 
     def ptz_command(self, ser, address, cmd2, pan_speed=0, tilt_speed=0):
         """
