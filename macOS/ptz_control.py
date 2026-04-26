@@ -3,7 +3,6 @@
 import sys
 import time
 import pygame
-import serial
 from senders import SenderFunctions
 
 class PTZControl:
@@ -43,10 +42,7 @@ class PTZControl:
 
         self.sender_functions = SenderFunctions()
 
-        self.ser = serial.Serial(
-            self.sender_functions.tx_port,
-            self.sender_functions.baud_rate, timeout=1
-        )
+        self.ser = None
 
         time.sleep(2)  # Wait for the serial port to initialize
 
@@ -77,16 +73,19 @@ class PTZControl:
 
         return max(0, min(scaled_speed, 63))
 
-    def read_inputs(self):
+    def read_inputs(self, ser_ref):
         """Read inputs from the controller once and update the GUI.
 
         This function performs a single poll of the controller and then
         re-schedules itself using `tk.after` so it doesn't block the GUI
         mainloop.
         """
-        # Ensure RS-485 DE/RE (RTS) handling on platforms/adapters that require it.
-        # On some macOS USB-RS485 adapters the DE signal isn't toggled automatically
-        # unless pyserial's rs485_mode is configured.
+        if ser_ref:
+            self.ser = ser_ref
+        elif self.ser is None:
+            print("Serial reference not provided and self.ser is None. Cannot send commands.")
+            return
+
         try:
             # Pygame needs to "pump" events to update the values
             pygame.event.pump()
@@ -214,7 +213,7 @@ class PTZControl:
                 except Exception:
                     pass
             self.ser.close()
-        
+
         except KeyboardInterrupt:
             print("\nExiting gracefully...")
             try:

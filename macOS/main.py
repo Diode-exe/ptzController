@@ -2,6 +2,7 @@
 
 # import tkinter as tk
 # import threading
+import serial
 from ptz_control import PTZControl
 
 # class GUI:
@@ -36,5 +37,11 @@ if __name__ == "__main__":
     # gui.threaded_read_inputs()
 
     # gui.run()
-    while True:
-        ptz_control.read_inputs()
+    ser_conn = serial.Serial(
+        ptz_control.sender_functions.tx_port,
+        ptz_control.sender_functions.baud_rate, timeout=1
+    )
+    with serial.Serial(ptz_control.sender_functions.tx_port,
+                       ptz_control.sender_functions.baud_rate, timeout=1) as ser:
+        while True:
+            ptz_control.read_inputs(ser_ref=ser)
