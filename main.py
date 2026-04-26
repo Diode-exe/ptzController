@@ -1,7 +1,5 @@
 """PTZ Controller"""
 
-import tkinter as tk
-import threading
 import os
 import serial
 from ptz_control import PTZControl
@@ -13,6 +11,8 @@ class GlobalClass:
         self.ptz_control = None
 
 if os.name == 'nt':  # Windows
+    import tkinter as tk
+    import threading
     class GUI:
         """Graphical User Interface for displaying controller inputs."""
         def __init__(self, global_class_ref):
