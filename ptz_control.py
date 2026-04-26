@@ -2,12 +2,11 @@
 
 import sys
 import pygame
-import serial
 from senders import SenderFunctions
 
 class PTZControl:
     """Class to handle PTZ control logic and read controller inputs."""
-    def __init__(self, gui_arg):
+    def __init__(self, gui_arg=None):
         self.controller = None
         self.ls_x = 0.0
         self.ls_y = 0.0
@@ -36,7 +35,13 @@ class PTZControl:
 
         self.dpad_direction = "Neutral"
 
+        self.hat_exist = True
+        self.cam_moving = False
+        self.dpad_pressed = False
+
         self.gui = gui_arg
+
+        self.ser = None
 
         self.sender_functions = SenderFunctions()
 
@@ -67,13 +72,19 @@ class PTZControl:
 
         return max(0, min(scaled_speed, 63))
 
-    def read_inputs(self):
+    def read_inputs(self, ser_ref=None):
         """Read inputs from the controller once and update the GUI.
 
         This function performs a single poll of the controller and then
         re-schedules itself using `tk.after` so it doesn't block the GUI
         mainloop.
         """
+        if ser_ref:
+            self.ser = ser_ref
+        elif self.ser is None:
+            print("Serial reference not provided and self.ser is None. Cannot send commands.")
+            return
+
         try:
             # Pygame needs to "pump" events to update the values
             pygame.event.pump()
@@ -104,18 +115,24 @@ class PTZControl:
             self.buttons = self.controller.get_numbuttons()
 
             # HAT (D-pad)
-            self.dpad_x, self.dpad_y = self.controller.get_hat(0)
-
-            if self.dpad_x == -1:
-                self.dpad_direction = "Left"
-            elif self.dpad_x == 1:
-                self.dpad_direction = "Right"
-            elif self.dpad_y == -1:
-                self.dpad_direction = "Down"
-            elif self.dpad_y == 1:
-                self.dpad_direction = "Up"
-            else:
-                self.dpad_direction = "Neutral"
+            try:
+                self.dpad_x, self.dpad_y = self.controller.get_hat(0)
+                self.hat_exist = True
+            except Exception:
+                print("No HAT (D-pad) found on this controller.")
+                self.dpad_x, self.dpad_y = 0, 0
+                self.hat_exist = False
+            if self.hat_exist:
+                if self.dpad_x == -1:
+                    self.dpad_direction = "Left"
+                elif self.dpad_x == 1:
+                    self.dpad_direction = "Right"
+                elif self.dpad_y == -1:
+                    self.dpad_direction = "Down"
+                elif self.dpad_y == 1:
+                    self.dpad_direction = "Up"
+                else:
+                    self.dpad_direction = "Neutral"
 
             controller_inputs_text = (
                 f"Axes: {self.axes} | Buttons: {self.buttons} "
@@ -128,30 +145,46 @@ class PTZControl:
                 f"| LS Click: {self.ls_click} | RS Click: {self.rs_click} "
                 f"| DPad: {self.dpad_direction} | Address: {self.sender_functions.address} "
             )
-            self.gui.controller_inputs_var.set(controller_inputs_text)
-            with serial.Serial(self.sender_functions.tx_port,
-                               self.sender_functions.baud_rate, timeout=1) as ser:
-                if self.ls_y < -0.5:
-                    self.sender_functions.move_up(ser, speed=self.map_speed(self.ls_y))
-                elif self.ls_y > 0.5:
-                    self.sender_functions.move_down(ser, speed=self.map_speed(self.ls_y))
-                elif self.ls_x < -0.5:
-                    self.sender_functions.move_left(ser, speed=self.map_speed(self.ls_x))
-                elif self.ls_x > 0.5:
-                    self.sender_functions.move_right(ser, speed=self.map_speed(self.ls_x))
-                else:
-                    self.sender_functions.stop(ser)
-                if self.lt > 0.5:
-                    self.sender_functions.zoom_in(ser)
-                elif self.rt > 0.5:
-                    self.sender_functions.zoom_out(ser)
-                if self.dpad_direction == "Up":
-                    self.sender_functions.address += 1
-                elif self.dpad_direction == "Down" and self.sender_functions.address > 1:
-                    self.sender_functions.address -= 1
-
-            # Schedule the next poll on the Tk mainloop (milliseconds)
-            self.gui.root.after(50, self.read_inputs)  # ~20 Hz
+            if self.gui:
+                self.gui.controller_inputs_var.set(controller_inputs_text)
+            if self.ls_y < -0.5:
+                self.cam_moving = True
+                self.sender_functions.move_up(self.ser, speed=self.map_speed(self.ls_y))
+            elif self.ls_y > 0.5:
+                self.cam_moving = True
+                self.sender_functions.move_down(self.ser, speed=self.map_speed(self.ls_y))
+            elif self.ls_x < -0.5:
+                self.cam_moving = True
+                self.sender_functions.move_left(self.ser, speed=self.map_speed(self.ls_x))
+            elif self.ls_x > 0.5:
+                self.cam_moving = True
+                self.sender_functions.move_right(self.ser, speed=self.map_speed(self.ls_x))
+            else:
+                if self.cam_moving:
+                    self.sender_functions.stop(self.ser)
+                    self.cam_moving = False
+            if self.lt > 0.5:
+                self.cam_moving = True
+                self.sender_functions.zoom_in(self.ser)
+            elif self.rt > 0.5:
+                self.cam_moving = True
+                self.sender_functions.zoom_out(self.ser)
+            else:
+                if self.cam_moving:
+                    self.sender_functions.stop(self.ser)
+                    self.cam_moving = False
+            if self.dpad_direction == "Up" and not self.dpad_pressed:
+                self.dpad_pressed = True
+                self.sender_functions.address += 1
+            elif self.dpad_direction == "Down" and \
+                self.sender_functions.address > 1 and not self.dpad_pressed:
+                self.dpad_pressed = True
+                self.sender_functions.address -= 1
+            else:
+                self.dpad_pressed = False
+            if self.gui:
+                # Schedule the next poll on the Tk mainloop (milliseconds)
+                self.gui.root.after(50, self.read_inputs)  # ~20 Hz
 
         except Exception as e:
             print("Error reading inputs:", e)
@@ -160,7 +193,8 @@ class PTZControl:
             except Exception:
                 pass
             # If GUI exists, close it to stop the app
-            try:
-                self.gui.root.quit()
-            except Exception:
-                pass
+            if self.gui:
+                try:
+                    self.gui.root.quit()
+                except Exception:
+                    pass
