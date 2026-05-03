@@ -1,6 +1,7 @@
 """PTZ Controller"""
 
 import os
+import time
 import serial
 from ptz_control import PTZControl
 
@@ -67,3 +68,4 @@ if __name__ == "__main__":
                     global_class.ptz_control.sender_functions.baud_rate, timeout=1) as ser:
             while True:
                 global_class.ptz_control.read_inputs(ser_ref=ser)
+                time.sleep(1)  # Add a small delay to prevent high CPU usage

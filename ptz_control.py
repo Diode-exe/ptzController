@@ -4,6 +4,13 @@ import os
 import sys
 import pygame
 from senders import SenderFunctions
+try:
+    import map_speed
+except ImportError:
+    print("Error: Could not import map_speed module. Make sure to run compile_modules.py first.")
+    print("For now, importing Python version")
+    from map_speed_python import MapSpeed
+    map_speed = MapSpeed().map_speed
 
 class PTZControl:
     """Class to handle PTZ control logic and read controller inputs."""
@@ -65,15 +72,7 @@ class PTZControl:
 
     def map_speed(self, axis_value, deadzone=0.05):
         """Maps a joystick axis value (-1.0 to 1.0) to a Pelco-D speed (0 to 63) with a deadzone."""
-        # If the stick is only moved slightly, return 0 to prevent "creep"
-        if abs(axis_value) < deadzone:
-            return 0
-
-        # Scale the remaining 0.1 -> 1.0 range to 0 -> 63
-        # This ensures that once you pass the deadzone, you start at speed 1
-        scaled_speed = int((abs(axis_value) - deadzone) / (1.0 - deadzone) * 63)
-
-        return max(0, min(scaled_speed, 63))
+        return map_speed.map_speed(axis_value, deadzone)
 
     def read_inputs(self, ser_ref=None):
         """Read inputs from the controller once and update the GUI.
@@ -150,26 +149,26 @@ class PTZControl:
             )
             if self.gui:
                 self.gui.controller_inputs_var.set(controller_inputs_text)
-            if self.ls_y < -0.5:
+            if self.ls_y < -0.05:
                 self.cam_moving = True
-                self.sender_functions.move_up(self.ser, speed=self.map_speed(self.ls_y))
-            elif self.ls_y > 0.5:
+                self.sender_functions.move_up(self.ser, speed=map_speed.map_speed(self.ls_y))
+            elif self.ls_y > 0.05:
                 self.cam_moving = True
-                self.sender_functions.move_down(self.ser, speed=self.map_speed(self.ls_y))
-            elif self.ls_x < -0.5:
+                self.sender_functions.move_down(self.ser, speed=map_speed.map_speed(self.ls_y))
+            elif self.ls_x < -0.05:
                 self.cam_moving = True
-                self.sender_functions.move_left(self.ser, speed=self.map_speed(self.ls_x))
-            elif self.ls_x > 0.5:
+                self.sender_functions.move_left(self.ser, speed=map_speed.map_speed(self.ls_x))
+            elif self.ls_x > 0.05:
                 self.cam_moving = True
-                self.sender_functions.move_right(self.ser, speed=self.map_speed(self.ls_x))
+                self.sender_functions.move_right(self.ser, speed=map_speed.map_speed(self.ls_x))
             else:
                 if self.cam_moving:
                     self.sender_functions.stop(self.ser)
                     self.cam_moving = False
-            if self.lt > 0.5:
+            if self.lt > 0.05:
                 self.cam_moving = True
                 self.sender_functions.zoom_in(self.ser)
-            elif self.rt > 0.5:
+            elif self.rt > 0.05:
                 self.cam_moving = True
                 self.sender_functions.zoom_out(self.ser)
             else:
