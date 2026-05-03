@@ -187,6 +187,7 @@ class PTZControl:
             if self.gui:
                 # Schedule the next poll on the Tk mainloop (milliseconds)
                 self.gui.root.after(50, self.read_inputs)  # ~20 Hz
+            print(controller_inputs_text)  # Also print to console for non-GUI users
 
         except Exception as e:
             print("Error reading inputs:", e)
